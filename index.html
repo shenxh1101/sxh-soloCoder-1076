@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蓝图 - 解谜游戏</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/grid.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="title">
+        <span class="title-icon">⚙</span>
+        <span>蓝图 BLUEPRINT</span>
+      </h1>
+      <nav class="nav">
+        <button class="nav-btn" id="btn-levels">关卡选择</button>
+        <button class="nav-btn" id="btn-editor">关卡编辑器</button>
+        <button class="nav-btn" id="btn-import">导入关卡</button>
+      </nav>
+    </header>
+
+    <main class="main">
+      <aside class="sidebar-left">
+        <div class="panel">
+          <h2 class="panel-title">组件库</h2>
+          <div class="component-list" id="component-list">
+          </div>
+          <div class="component-info">
+            <p class="info-text" id="component-info">
+              选择组件后点击网格放置
+              <br>
+              <small>左键旋转 · 右键删除 · 滚轮/R键旋转预览</small>
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="canvas-container">
+        <div class="level-info" id="level-info">
+          <h2 class="level-name" id="level-name">选择一个关卡开始游戏</h2>
+          <div class="level-meta">
+            <span class="difficulty" id="level-difficulty"></span>
+            <span class="hint" id="level-hint"></span>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="game-canvas" class="game-canvas"></canvas>
+          <div class="overlay" id="canvas-overlay">
+            <div class="overlay-content">
+              <p class="overlay-text" id="overlay-text">请选择关卡</p>
+            </div>
+          </div>
+        </div>
+        <div class="simulation-info">
+          <div class="time-display">
+            <span class="time-label">时间步数:</span>
+            <span class="time-value" id="time-steps">0</span>
+          </div>
+          <div class="simulation-status" id="simulation-status"></div>
+        </div>
+      </section>
+
+      <aside class="sidebar-right">
+        <div class="panel">
+          <h2 class="panel-title">控制</h2>
+          <div class="control-group">
+            <button class="btn btn-primary" id="btn-run">
+              <span class="btn-icon">▶</span>
+              <span>运行</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-pause">
+              <span class="btn-icon">⏸</span>
+              <span>暂停</span>
+            </button>
+            <button class="btn btn-warning" id="btn-reset">
+              <span class="btn-icon">↻</span>
+              <span>重置</span>
+            </button>
+          </div>
+
+          <div class="control-group">
+            <button class="btn btn-secondary" id="btn-undo" disabled>
+              <span class="btn-icon">↶</span>
+              <span>撤销 (Ctrl+Z)</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-redo" disabled>
+              <span class="btn-icon">↷</span>
+              <span>重做 (Ctrl+Y)</span>
+            </button>
+          </div>
+
+          <div class="control-group">
+            <label class="speed-label">模拟速度</label>
+            <input type="range" class="speed-slider" id="speed-slider" min="0.5" max="3" step="0.5" value="1">
+            <span class="speed-value" id="speed-value">1x</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">剩余组件</h2>
+          <div class="remaining-list" id="remaining-list">
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">快捷键</h2>
+          <ul class="shortcut-list">
+            <li><kbd>R</kbd> 旋转选中组件</li>
+            <li><kbd>Space</kbd> 运行/暂停</li>
+            <li><kbd>Ctrl+Z</kbd> 撤销</li>
+            <li><kbd>Ctrl+Y</kbd> 重做</li>
+            <li><kbd>Delete</kbd> 删除组件</li>
+            <li><kbd>Esc</kbd> 取消选择</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <div class="modal" id="level-select-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>选择关卡</h2>
+          <button class="modal-close" id="close-level-modal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="level-tabs">
+            <button class="tab-btn active" data-tab="preset">预设关卡</button>
+            <button class="tab-btn" data-tab="custom">自定义关卡</button>
+          </div>
+          <div class="level-grid" id="level-grid">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editor-modal">
+      <div class="modal-content editor-modal">
+        <div class="modal-header">
+          <h2>关卡编辑器</h2>
+          <button class="modal-close" id="close-editor-modal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="editor-layout">
+            <div class="editor-tools">
+              <div class="editor-section">
+                <h3>基本设置</h3>
+                <div class="form-group">
+                  <label>关卡名称</label>
+                  <input type="text" id="editor-name" value="新关卡">
+                </div>
+                <div class="form-group">
+                  <label>难度
+                    <select id="editor-difficulty">
+                      <option value="1">★☆☆☆☆</option>
+                      <option value="2">★★☆☆☆</option>
+                      <option value="3">★★★☆☆</option>
+                      <option value="4">★★★★☆</option>
+                      <option value="5">★★★★★</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label>网格宽度
+                    <input type="number" id="editor-width" value="8" min="3" max="20">
+                  </label>
+                  <label>网格高度
+                    <input type="number" id="editor-height" value="6" min="3" max="20">
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label>提示</label>
+                  <textarea id="editor-hint" rows="2"></textarea>
+                </div>
+              </div>
+
+              <div class="editor-section">
+                <h3>放置工具</h3>
+                <div class="tool-group">
+                  <button class="tool-btn active" data-tool="input">输入端</button>
+                  <button class="tool-btn" data-tool="output">输出端</button>
+                  <button class="tool-btn" data-tool="obstacle">障碍物</button>
+                  <button class="tool-btn" data-tool="clear">清除</button>
+                </div>
+                <div class="form-group">
+                  <label>输入方向
+                    <select id="editor-input-dir">
+                      <option value="0">上 ↑</option>
+                      <option value="1" selected>右 →</option>
+                      <option value="2">下 ↓</option>
+                      <option value="3">左 ←</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <div class="editor-section">
+                <h3>可用组件</h3>
+                <div class="component-config" id="component-config">
+                </div>
+              </div>
+
+              <div class="editor-actions">
+                <button class="btn btn-primary" id="editor-test">测试关卡</button>
+                <button class="btn btn-secondary" id="editor-save">保存</button>
+                <button class="btn btn-success" id="editor-export">导出JSON</button>
+                <button class="btn btn-warning" id="editor-cancel">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>导入社区关卡</h2>
+          <button class="modal-close" id="close-import-modal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="import-section">
+            <h3>粘贴JSON数据</h3>
+            <textarea id="import-json" class="import-textarea" placeholder="在此粘贴关卡JSON数据..."></textarea>
+            <div class="form-group">
+              <label>或选择JSON文件
+                <input type="file" id="import-file" accept=".json">
+              </label>
+            </div>
+            <div class="import-actions">
+              <button class="btn btn-primary" id="btn-import-confirm">导入</button>
+              <button class="btn btn-secondary" id="btn-import-paste">从剪贴板粘贴</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/Component.js"></script>
+  <script src="js/Particle.js"></script>
+  <script src="js/Grid.js"></script>
+  <script src="js/Simulation.js"></script>
+  <script src="js/HistoryManager.js"></script>
+  <script src="js/LevelManager.js"></script>
+  <script src="js/IOManager.js"></script>
+  <script src="js/Editor.js"></script>
+  <script src="js/Game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+@media (max-width: 1200px) {
+  .sidebar-left,
+  .sidebar-right {
+    width: 220px;
+    padding: 12px;
+  }
+
+  .level-name {
+    font-size: 18px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .nav-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 992px) {
+  .main {
+    flex-direction: column;
+  }
+
+  .sidebar-left,
+  .sidebar-right {
+    width: 100%;
+    max-height: 200px;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid var(--border-color);
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .sidebar-right {
+    border-bottom: none;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .panel {
+    min-width: 200px;
+    flex-shrink: 0;
+  }
+
+  .canvas-container {
+    padding: 12px;
+  }
+
+  .editor-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .editor-modal {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .title-icon {
+    font-size: 22px;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .sidebar-left,
+  .sidebar-right {
+    max-height: 180px;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .panel {
+    min-width: 180px;
+    padding: 12px;
+  }
+
+  .panel-title {
+    font-size: 12px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  .component-item {
+    padding: 8px 10px;
+  }
+
+  .component-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .btn-icon {
+    font-size: 12px;
+  }
+
+  .level-info {
+    margin-bottom: 12px;
+  }
+
+  .level-name {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .level-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hint {
+    font-size: 12px;
+    max-width: 100%;
+  }
+
+  .canvas-wrapper {
+    padding: 10px;
+  }
+
+  .simulation-info {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .time-display {
+    font-size: 16px;
+  }
+
+  .time-value {
+    font-size: 20px;
+  }
+
+  .modal-content {
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 18px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .level-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .level-card {
+    padding: 12px;
+  }
+
+  .level-card h3 {
+    font-size: 12px;
+  }
+
+  .level-tabs {
+    margin-bottom: 16px;
+  }
+
+  .tab-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .tool-group {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tool-btn {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-group label {
+    font-size: 11px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .editor-actions {
+    gap: 6px;
+  }
+
+  .import-actions {
+    flex-direction: column;
+  }
+
+  .import-actions .btn {
+    width: 100%;
+  }
+
+  .toast {
+    max-width: 90vw;
+    font-size: 13px;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-btn {
+    width: 100%;
+  }
+
+  .sidebar-left,
+  .sidebar-right {
+    max-height: 160px;
+  }
+
+  .panel {
+    min-width: 160px;
+  }
+
+  .component-list {
+    gap: 6px;
+  }
+
+  .component-item {
+    padding: 6px 8px;
+    gap: 8px;
+  }
+
+  .component-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .component-name {
+    font-size: 11px;
+  }
+
+  .component-count {
+    font-size: 10px;
+  }
+
+  .level-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .level-card {
+    padding: 10px;
+  }
+
+  .level-card h3 {
+    font-size: 11px;
+  }
+
+  .shortcut-list li {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+
+  kbd {
+    padding: 1px 4px;
+    font-size: 10px;
+  }
+
+  .simulation-status {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .overlay-text {
+    font-size: 18px;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .component-item:hover:not(.disabled) {
+    transform: none;
+  }
+
+  .btn:not(:disabled):hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn:not(:disabled):active {
+    transform: scale(0.95);
+  }
+
+  .level-card:hover {
+    transform: none;
+  }
+
+  .level-card:active {
+    transform: scale(0.98);
+  }
+
+  .canvas-wrapper:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .game-canvas {
+    touch-action: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .title-icon {
+    animation: none;
+  }
+
+  .panel-title::before {
+    animation: none;
+  }
+}
