@@ -64,6 +64,10 @@ class Game {
       this.simulation = null;
     }
 
+    this.editor.isActive = false;
+    this.editor.savedState = null;
+    this.editor.editingLevel = null;
+
     this.grid = new Grid(level.gridSize.width, level.gridSize.height);
 
     this.grid.setCell(level.input.x, level.input.y, 'input');

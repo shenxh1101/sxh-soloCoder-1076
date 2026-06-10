@@ -231,6 +231,17 @@ body {
   pointer-events: auto;
 }
 
+.overlay.pass-through {
+  pointer-events: none !important;
+}
+
+.overlay.pass-through .overlay-text {
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  background: rgba(10, 25, 47, 0.7);
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
 .overlay-content {
   text-align: center;
 }

@@ -270,6 +270,13 @@ function setupEventListeners() {
 }
 
 function updateUI() {
+  const main = document.querySelector('.main');
+  if (game.editor.isActive) {
+    main.classList.add('editor-active');
+  } else {
+    main.classList.remove('editor-active');
+  }
+
   updateComponentList();
   updateRemainingList();
   updateLevelInfo();
@@ -427,14 +434,17 @@ function updateCanvasOverlay() {
   const overlay = document.getElementById('canvas-overlay');
   const overlayText = document.getElementById('overlay-text');
 
-  if (!game.currentLevel) {
+  if (game.editor.isActive) {
     overlay.classList.add('show');
-    overlayText.textContent = '请选择关卡';
-  } else if (game.editor.isActive) {
-    overlay.classList.add('show');
+    overlay.classList.add('pass-through');
     overlayText.textContent = '编辑器模式 - 点击网格放置元素';
+  } else if (!game.currentLevel) {
+    overlay.classList.add('show');
+    overlay.classList.remove('pass-through');
+    overlayText.textContent = '请选择关卡';
   } else {
     overlay.classList.remove('show');
+    overlay.classList.remove('pass-through');
   }
 }
 
@@ -516,7 +526,6 @@ function showEditorPanel() {
 
   renderComponentConfig();
 
-  document.querySelector('.main').classList.add('editor-active');
   document.getElementById('components-panel').classList.add('hidden');
   document.getElementById('editor-panel').classList.remove('hidden');
 
@@ -524,9 +533,9 @@ function showEditorPanel() {
 }
 
 function hideEditorPanel() {
-  document.querySelector('.main').classList.remove('editor-active');
   document.getElementById('components-panel').classList.remove('hidden');
   document.getElementById('editor-panel').classList.add('hidden');
+  updateUI();
 }
 
 function renderComponentConfig() {
