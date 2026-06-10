@@ -37,6 +37,10 @@ function setupGameCallbacks() {
     showToast('❌ 能量传输失败！请检查路径设计。', 'error');
     updateUI();
   };
+
+  game.onStateChange = () => {
+    updateUI();
+  };
 }
 
 function setupEventListeners() {
@@ -45,7 +49,13 @@ function setupEventListeners() {
   });
 
   document.getElementById('btn-editor').addEventListener('click', () => {
-    showEditorModal();
+    showEditorPanel();
+  });
+
+  document.getElementById('editor-close-btn').addEventListener('click', () => {
+    hideEditorPanel();
+    game.editor.cancel();
+    updateUI();
   });
 
   document.getElementById('btn-import').addEventListener('click', () => {
@@ -97,11 +107,7 @@ function setupEventListeners() {
     hideModal('level-select-modal');
   });
 
-  document.getElementById('close-editor-modal').addEventListener('click', () => {
-    hideModal('editor-modal');
-    game.editor.cancel();
-    updateUI();
-  });
+  // 移除旧的editor-modal关闭按钮监听
 
   document.getElementById('close-import-modal').addEventListener('click', () => {
     hideModal('import-modal');
@@ -120,17 +126,13 @@ function setupEventListeners() {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         hideModal(modal.id);
-        if (modal.id === 'editor-modal') {
-          game.editor.cancel();
-          updateUI();
-        }
       }
     });
   });
 
-  document.querySelectorAll('.tool-btn').forEach(btn => {
+  document.querySelectorAll('#editor-panel .tool-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#editor-panel .tool-btn').forEach(b => b.classList.remove('active'));
       e.target.classList.add('active');
       game.editor.selectedTool = e.target.dataset.tool;
     });
@@ -177,7 +179,7 @@ function setupEventListeners() {
   document.getElementById('editor-test').addEventListener('click', () => {
     try {
       game.editor.test();
-      hideModal('editor-modal');
+      hideEditorPanel();
       updateUI();
       showToast('关卡已加载，可以开始测试！', 'success');
     } catch (e) {
@@ -188,7 +190,7 @@ function setupEventListeners() {
   document.getElementById('editor-save').addEventListener('click', () => {
     try {
       const level = game.editor.save();
-      hideModal('editor-modal');
+      hideEditorPanel();
       game.editor.isActive = false;
       game.editor.editingLevel = null;
       game.editor.restoreSavedState();
@@ -216,7 +218,7 @@ function setupEventListeners() {
   });
 
   document.getElementById('editor-cancel').addEventListener('click', () => {
-    hideModal('editor-modal');
+    hideEditorPanel();
     game.editor.cancel();
     updateUI();
   });
@@ -499,7 +501,7 @@ function renderLevelGrid() {
   }
 }
 
-function showEditorModal() {
+function showEditorPanel() {
   game.editor.startNewLevel();
 
   document.getElementById('editor-name').value = '新关卡';
@@ -509,12 +511,20 @@ function showEditorModal() {
   document.getElementById('editor-hint').value = '';
   document.getElementById('editor-input-dir').value = '1';
 
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.tool-btn[data-tool="input"]').classList.add('active');
+  document.querySelectorAll('#editor-panel .tool-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('#editor-panel .tool-btn[data-tool="input"]').classList.add('active');
 
   renderComponentConfig();
-  showModal('editor-modal');
+
+  document.getElementById('components-panel').classList.add('hidden');
+  document.getElementById('editor-panel').classList.remove('hidden');
+
   updateUI();
+}
+
+function hideEditorPanel() {
+  document.getElementById('components-panel').classList.remove('hidden');
+  document.getElementById('editor-panel').classList.add('hidden');
 }
 
 function renderComponentConfig() {

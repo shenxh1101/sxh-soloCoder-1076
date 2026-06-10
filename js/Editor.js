@@ -59,6 +59,11 @@ class Editor {
 
     const state = this.savedState;
 
+    if (this.game.simulation && typeof this.game.simulation.destroy === 'function') {
+      this.game.simulation.destroy();
+      this.game.simulation = null;
+    }
+
     if (state.currentLevel) {
       this.game.currentLevel = state.currentLevel;
       this.game.grid = state.grid;
@@ -69,7 +74,7 @@ class Editor {
       if (state.simulation) {
         this.game.simulation = new Simulation(this.game.grid, state.currentLevel.input, state.currentLevel.output);
         this.game.simulation.timeSteps = state.simulation.timeSteps;
-        this.game.simulation.particles = state.simulation.particles;
+        this.game.simulation.particles = state.simulation.particles.map(p => p.clone ? p.clone() : new Particle(p.x, p.y, p.direction));
         this.game.simulation.isComplete = state.simulation.isComplete;
         this.game.simulation.isFailed = state.simulation.isFailed;
         this.game.simulation.onComplete((steps) => this.game.handleSimulationComplete(steps));
@@ -84,6 +89,7 @@ class Editor {
       this.game.saveHistory();
       this.game.adjustCanvasSize();
       this.game.startAnimation();
+      if (this.game.onStateChange) this.game.onStateChange();
     } else {
       this.game.showLevelSelect();
       this.game.startAnimation();
@@ -224,7 +230,50 @@ class Editor {
     height = Math.max(3, Math.min(20, height));
 
     this.editingLevel.gridSize = { width, height };
+
+    this.validateAndFixPositions(width, height);
     this.loadLevelToGrid();
+  }
+
+  validateAndFixPositions(width, height) {
+    const level = this.editingLevel;
+    const issues = [];
+
+    if (level.input.x >= width || level.input.y >= height) {
+      level.input.x = Math.min(level.input.x, width - 1);
+      level.input.y = Math.min(level.input.y, height - 1);
+      issues.push('输入端位置已自动调整到新网格范围内');
+    }
+
+    if (level.output.x >= width || level.output.y >= height) {
+      level.output.x = Math.min(level.output.x, width - 1);
+      level.output.y = Math.min(level.output.y, height - 1);
+      issues.push('输出端位置已自动调整到新网格范围内');
+    }
+
+    const validObstacles = [];
+    for (const obstacle of level.obstacles) {
+      if (obstacle.x < width && obstacle.y < height) {
+        validObstacles.push(obstacle);
+      }
+    }
+    if (validObstacles.length !== level.obstacles.length) {
+      const removed = level.obstacles.length - validObstacles.length;
+      level.obstacles = validObstacles;
+      issues.push(`已移除 ${removed} 个超出新网格范围的障碍物`);
+    }
+
+    if (level.input.x === level.output.x && level.input.y === level.output.y) {
+      level.output.x = Math.min(level.input.x + 1, width - 1);
+      level.output.y = level.input.y;
+      issues.push('输出端位置已自动调整，避免与输入端重合');
+    }
+
+    if (issues.length > 0) {
+      setTimeout(() => {
+        issues.forEach(msg => showToast(msg, 'warning'));
+      }, 100);
+    }
   }
 
   setDifficulty(difficulty) {
@@ -258,8 +307,9 @@ class Editor {
   }
 
   save() {
-    if (!this.validateEditingLevel()) {
-      throw new Error('关卡不完整，请确保设置了输入输出端');
+    const validation = this.validateEditingLevel();
+    if (!validation.isValid) {
+      throw new Error('关卡不完整：' + validation.errors.join('；'));
     }
 
     this.game.levelManager.saveCustomLevel(deepClone(this.editingLevel));
@@ -268,22 +318,42 @@ class Editor {
 
   validateEditingLevel() {
     const level = this.editingLevel;
+    const errors = [];
 
-    if (!level.input || !level.output) return false;
+    if (!level.input) {
+      errors.push('请设置输入端位置');
+    } else if (level.input.x < 0 || level.input.x >= level.gridSize.width || 
+               level.input.y < 0 || level.input.y >= level.gridSize.height) {
+      errors.push('输入端位置不在网格范围内');
+    }
 
-    if (level.input.x === level.output.x && level.input.y === level.output.y) {
-      return false;
+    if (!level.output) {
+      errors.push('请设置输出端位置');
+    } else if (level.output.x < 0 || level.output.x >= level.gridSize.width || 
+               level.output.y < 0 || level.output.y >= level.gridSize.height) {
+      errors.push('输出端位置不在网格范围内');
+    }
+
+    if (level.input && level.output && 
+        level.input.x === level.output.x && level.input.y === level.output.y) {
+      errors.push('输入端和输出端不能在同一位置');
     }
 
     const totalComponents = Object.values(level.availableComponents).reduce((a, b) => a + b, 0);
-    if (totalComponents === 0) return false;
+    if (totalComponents === 0) {
+      errors.push('请至少设置一种可用组件');
+    }
 
-    return true;
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
   }
 
   test() {
-    if (!this.validateEditingLevel()) {
-      throw new Error('关卡不完整，无法测试');
+    const validation = this.validateEditingLevel();
+    if (!validation.isValid) {
+      throw new Error('关卡不完整：' + validation.errors.join('；'));
     }
 
     const testLevel = deepClone(this.editingLevel);
@@ -293,8 +363,9 @@ class Editor {
   }
 
   export() {
-    if (!this.validateEditingLevel()) {
-      throw new Error('关卡不完整，无法导出');
+    const validation = this.validateEditingLevel();
+    if (!validation.isValid) {
+      throw new Error('关卡不完整：' + validation.errors.join('；'));
     }
 
     return this.game.ioManager.exportLevel(this.editingLevel);

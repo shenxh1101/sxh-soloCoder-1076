@@ -21,6 +21,7 @@ class Game {
 
     this.onLevelComplete = null;
     this.onLevelFail = null;
+    this.onStateChange = null;
   }
 
   init(canvas) {
@@ -58,6 +59,11 @@ class Game {
     this.selectedRotation = 0;
     this.hoveredCell = null;
 
+    if (this.simulation && typeof this.simulation.destroy === 'function') {
+      this.simulation.destroy();
+      this.simulation = null;
+    }
+
     this.grid = new Grid(level.gridSize.width, level.gridSize.height);
 
     this.grid.setCell(level.input.x, level.input.y, 'input');
@@ -79,6 +85,7 @@ class Game {
     this.adjustCanvasSize();
     this.startAnimation();
     this.render();
+    if (this.onStateChange) this.onStateChange();
   }
 
   adjustCanvasSize() {
@@ -111,6 +118,7 @@ class Game {
 
     this.saveHistory();
     this.render();
+    if (this.onStateChange) this.onStateChange();
 
     return true;
   }
@@ -126,6 +134,7 @@ class Game {
 
     this.saveHistory();
     this.render();
+    if (this.onStateChange) this.onStateChange();
 
     return true;
   }
@@ -139,6 +148,7 @@ class Game {
     cell.rotate();
     this.saveHistory();
     this.render();
+    if (this.onStateChange) this.onStateChange();
     return true;
   }
 
@@ -186,6 +196,7 @@ class Game {
     const state = this.historyManager.undo();
     if (state) {
       this.restoreState(state);
+      if (this.onStateChange) this.onStateChange();
     }
   }
 
@@ -195,6 +206,7 @@ class Game {
     const state = this.historyManager.redo();
     if (state) {
       this.restoreState(state);
+      if (this.onStateChange) this.onStateChange();
     }
   }
 
@@ -320,6 +332,8 @@ class Game {
   }
 
   startAnimation() {
+    if (this.isAnimating) return;
+    
     this.isAnimating = true;
     const animate = () => {
       if (this.isAnimating) {
@@ -334,6 +348,7 @@ class Game {
     this.isAnimating = false;
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
+      this.animationFrame = null;
     }
   }
 
@@ -392,10 +407,18 @@ class Game {
 
   showLevelSelect() {
     this.stopAnimation();
+    
+    if (this.simulation && typeof this.simulation.destroy === 'function') {
+      this.simulation.destroy();
+    }
+    
     this.currentLevel = null;
     this.selectedComponent = null;
     this.grid = null;
     this.simulation = null;
+    this.hoveredCell = null;
+    this.historyManager.reset();
+    
     this.startAnimation();
   }
 

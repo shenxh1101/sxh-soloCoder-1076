@@ -29,7 +29,7 @@
 
     <main class="main">
       <aside class="sidebar-left">
-        <div class="panel">
+        <div class="panel" id="components-panel">
           <h2 class="panel-title">组件库</h2>
           <div class="component-list" id="component-list">
           </div>
@@ -39,6 +39,77 @@
               <br>
               <small>左键旋转 · 右键删除 · 滚轮/R键旋转预览</small>
             </p>
+          </div>
+        </div>
+
+        <div class="panel editor-panel hidden" id="editor-panel">
+          <div class="editor-header">
+            <h2 class="panel-title">关卡编辑器</h2>
+            <button class="editor-close-btn" id="editor-close-btn" title="关闭编辑器">×</button>
+          </div>
+          
+          <div class="editor-section">
+            <h3>基本设置</h3>
+            <div class="form-group">
+              <label>关卡名称</label>
+              <input type="text" id="editor-name" value="新关卡">
+            </div>
+            <div class="form-group">
+              <label>难度
+                <select id="editor-difficulty">
+                  <option value="1">★☆☆☆☆</option>
+                  <option value="2">★★☆☆☆</option>
+                  <option value="3">★★★☆☆</option>
+                  <option value="4">★★★★☆</option>
+                  <option value="5">★★★★★</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-group">
+              <label>网格宽度
+                <input type="number" id="editor-width" value="8" min="3" max="20">
+              </label>
+              <label>网格高度
+                <input type="number" id="editor-height" value="6" min="3" max="20">
+              </label>
+            </div>
+            <div class="form-group">
+              <label>提示</label>
+              <textarea id="editor-hint" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="editor-section">
+            <h3>放置工具</h3>
+            <div class="tool-group">
+              <button class="tool-btn active" data-tool="input">输入端</button>
+              <button class="tool-btn" data-tool="output">输出端</button>
+              <button class="tool-btn" data-tool="obstacle">障碍物</button>
+              <button class="tool-btn" data-tool="clear">清除</button>
+            </div>
+            <div class="form-group">
+              <label>输入方向
+                <select id="editor-input-dir">
+                  <option value="0">上 ↑</option>
+                  <option value="1" selected>右 →</option>
+                  <option value="2">下 ↓</option>
+                  <option value="3">左 ←</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="editor-section">
+            <h3>可用组件</h3>
+            <div class="component-config" id="component-config">
+            </div>
+          </div>
+
+          <div class="editor-actions">
+            <button class="btn btn-primary" id="editor-test">测试关卡</button>
+            <button class="btn btn-secondary" id="editor-save">保存</button>
+            <button class="btn btn-success" id="editor-export">导出JSON</button>
+            <button class="btn btn-warning" id="editor-cancel">取消</button>
           </div>
         </div>
       </aside>
@@ -136,84 +207,6 @@
             <button class="tab-btn" data-tab="custom">自定义关卡</button>
           </div>
           <div class="level-grid" id="level-grid">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal" id="editor-modal">
-      <div class="modal-content editor-modal">
-        <div class="modal-header">
-          <h2>关卡编辑器</h2>
-          <button class="modal-close" id="close-editor-modal">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="editor-layout">
-            <div class="editor-tools">
-              <div class="editor-section">
-                <h3>基本设置</h3>
-                <div class="form-group">
-                  <label>关卡名称</label>
-                  <input type="text" id="editor-name" value="新关卡">
-                </div>
-                <div class="form-group">
-                  <label>难度
-                    <select id="editor-difficulty">
-                      <option value="1">★☆☆☆☆</option>
-                      <option value="2">★★☆☆☆</option>
-                      <option value="3">★★★☆☆</option>
-                      <option value="4">★★★★☆</option>
-                      <option value="5">★★★★★</option>
-                    </select>
-                  </label>
-                </div>
-                <div class="form-group">
-                  <label>网格宽度
-                    <input type="number" id="editor-width" value="8" min="3" max="20">
-                  </label>
-                  <label>网格高度
-                    <input type="number" id="editor-height" value="6" min="3" max="20">
-                  </label>
-                </div>
-                <div class="form-group">
-                  <label>提示</label>
-                  <textarea id="editor-hint" rows="2"></textarea>
-                </div>
-              </div>
-
-              <div class="editor-section">
-                <h3>放置工具</h3>
-                <div class="tool-group">
-                  <button class="tool-btn active" data-tool="input">输入端</button>
-                  <button class="tool-btn" data-tool="output">输出端</button>
-                  <button class="tool-btn" data-tool="obstacle">障碍物</button>
-                  <button class="tool-btn" data-tool="clear">清除</button>
-                </div>
-                <div class="form-group">
-                  <label>输入方向
-                    <select id="editor-input-dir">
-                      <option value="0">上 ↑</option>
-                      <option value="1" selected>右 →</option>
-                      <option value="2">下 ↓</option>
-                      <option value="3">左 ←</option>
-                    </select>
-                  </label>
-                </div>
-              </div>
-
-              <div class="editor-section">
-                <h3>可用组件</h3>
-                <div class="component-config" id="component-config">
-                </div>
-              </div>
-
-              <div class="editor-actions">
-                <button class="btn btn-primary" id="editor-test">测试关卡</button>
-                <button class="btn btn-secondary" id="editor-save">保存</button>
-                <button class="btn btn-success" id="editor-export">导出JSON</button>
-                <button class="btn btn-warning" id="editor-cancel">取消</button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
