@@ -86,6 +86,12 @@ class StraightPipe extends Component {
     ctx.fillStyle = color + '20';
     ctx.fillRect(centerX - size * 0.2, y, size * 0.4, size);
   }
+
+  clone() {
+    const cloned = new StraightPipe(this.rotation, this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
+  }
 }
 
 class ElbowPipe extends Component {
@@ -126,6 +132,12 @@ class ElbowPipe extends Component {
     ctx.closePath();
     ctx.fill();
   }
+
+  clone() {
+    const cloned = new ElbowPipe(this.rotation, this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
+  }
 }
 
 class CrossPipe extends Component {
@@ -160,6 +172,12 @@ class CrossPipe extends Component {
     ctx.fillStyle = color + '20';
     ctx.fillRect(centerX - size * 0.2, y, size * 0.4, size);
     ctx.fillRect(x, centerY - size * 0.2, size, size * 0.4);
+  }
+
+  clone() {
+    const cloned = new CrossPipe(this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
   }
 }
 
@@ -220,6 +238,12 @@ class GearCW extends Component {
     ctx.closePath();
     ctx.fill();
   }
+
+  clone() {
+    const cloned = new GearCW(this.rotation, this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
+  }
 }
 
 class GearCCW extends Component {
@@ -279,6 +303,12 @@ class GearCCW extends Component {
     ctx.closePath();
     ctx.fill();
   }
+
+  clone() {
+    const cloned = new GearCCW(this.rotation, this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
+  }
 }
 
 class Conveyor extends Component {
@@ -323,6 +353,12 @@ class Conveyor extends Component {
     ctx.lineTo(x + size * 0.65, centerY + size * 0.12);
     ctx.closePath();
     ctx.fill();
+  }
+
+  clone() {
+    const cloned = new Conveyor(this.rotation, this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
   }
 }
 
@@ -370,6 +406,12 @@ class Detector extends Component {
     ctx.lineTo(x + size * 0.6, centerY + size * 0.12);
     ctx.closePath();
     ctx.fill();
+  }
+
+  clone() {
+    const cloned = new Detector(this.rotation, this.x, this.y);
+    cloned.delay = this.delay;
+    return cloned;
   }
 }
 

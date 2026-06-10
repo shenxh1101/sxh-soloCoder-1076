@@ -5,9 +5,12 @@ class Editor {
     this.editingLevel = null;
     this.editMode = 'place';
     this.selectedTool = 'input';
+    this.savedState = null;
   }
 
   startNewLevel() {
+    this.saveCurrentState();
+
     this.isActive = true;
     this.editingLevel = {
       id: generateId(),
@@ -30,12 +33,78 @@ class Editor {
       isCustom: true
     };
 
+    this.ensureGridExists();
     this.loadLevelToGrid();
   }
 
+  saveCurrentState() {
+    this.savedState = {
+      currentLevel: this.game.currentLevel ? deepClone(this.game.currentLevel) : null,
+      grid: this.game.grid ? this.game.grid.clone() : null,
+      remainingComponents: deepClone(this.game.remainingComponents),
+      selectedComponent: this.game.selectedComponent,
+      selectedRotation: this.game.selectedRotation,
+      simulation: this.game.simulation ? {
+        isRunning: this.game.simulation.isRunning,
+        timeSteps: this.game.simulation.timeSteps,
+        particles: this.game.simulation.particles.map(p => p.clone()),
+        isComplete: this.game.simulation.isComplete,
+        isFailed: this.game.simulation.isFailed
+      } : null
+    };
+  }
+
+  restoreSavedState() {
+    if (!this.savedState) return;
+
+    const state = this.savedState;
+
+    if (state.currentLevel) {
+      this.game.currentLevel = state.currentLevel;
+      this.game.grid = state.grid;
+      this.game.remainingComponents = state.remainingComponents;
+      this.game.selectedComponent = state.selectedComponent;
+      this.game.selectedRotation = state.selectedRotation;
+
+      if (state.simulation) {
+        this.game.simulation = new Simulation(this.game.grid, state.currentLevel.input, state.currentLevel.output);
+        this.game.simulation.timeSteps = state.simulation.timeSteps;
+        this.game.simulation.particles = state.simulation.particles;
+        this.game.simulation.isComplete = state.simulation.isComplete;
+        this.game.simulation.isFailed = state.simulation.isFailed;
+        this.game.simulation.onComplete((steps) => this.game.handleSimulationComplete(steps));
+        this.game.simulation.onFail(() => this.game.handleSimulationFail());
+
+        if (state.simulation.isRunning) {
+          this.game.simulation.start();
+        }
+      }
+
+      this.game.historyManager.reset();
+      this.game.saveHistory();
+      this.game.adjustCanvasSize();
+      this.game.startAnimation();
+    } else {
+      this.game.showLevelSelect();
+      this.game.startAnimation();
+    }
+
+    this.savedState = null;
+  }
+
+  ensureGridExists() {
+    if (!this.game.grid) {
+      this.game.grid = new Grid(8, 6);
+    }
+  }
+
   editLevel(level) {
+    this.saveCurrentState();
+
     this.isActive = true;
     this.editingLevel = deepClone(level);
+
+    this.ensureGridExists();
     this.loadLevelToGrid();
   }
 
@@ -220,6 +289,7 @@ class Editor {
     const testLevel = deepClone(this.editingLevel);
     this.game.loadLevelData(testLevel);
     this.isActive = false;
+    this.savedState = null;
   }
 
   export() {
@@ -233,7 +303,7 @@ class Editor {
   cancel() {
     this.isActive = false;
     this.editingLevel = null;
-    this.game.showLevelSelect();
+    this.restoreSavedState();
   }
 
   getEditingLevel() {

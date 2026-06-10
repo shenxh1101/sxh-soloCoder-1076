@@ -189,8 +189,11 @@ function setupEventListeners() {
     try {
       const level = game.editor.save();
       hideModal('editor-modal');
-      game.editor.cancel();
+      game.editor.isActive = false;
+      game.editor.editingLevel = null;
+      game.editor.restoreSavedState();
       showToast(`关卡 "${level.name}" 已保存！`, 'success');
+      updateUI();
     } catch (e) {
       showToast(e.message, 'error');
     }
@@ -556,7 +559,9 @@ function showImportModal() {
 }
 
 function showModal(modalId) {
-  document.getElementById(modalId).classList.add('show');
+  const modal = document.getElementById(modalId);
+  modal.style.display = '';
+  modal.classList.add('show');
 }
 
 function hideModal(modalId) {

@@ -77,6 +77,7 @@ class Game {
     this.saveHistory();
 
     this.adjustCanvasSize();
+    this.startAnimation();
     this.render();
   }
 
@@ -136,6 +137,7 @@ class Game {
     if (this.editor.isActive) return false;
 
     cell.rotate();
+    this.saveHistory();
     this.render();
     return true;
   }
@@ -208,10 +210,14 @@ class Game {
     this.grid = state.grid;
     this.remainingComponents = state.remainingComponents;
 
-    if (this.simulation) {
+    if (this.simulation && this.currentLevel) {
       this.simulation.grid = this.grid;
+      this.simulation.input = this.currentLevel.input;
+      this.simulation.output = this.currentLevel.output;
+      this.simulation.reset();
     }
 
+    this.adjustCanvasSize();
     this.render();
   }
 
@@ -390,6 +396,7 @@ class Game {
     this.selectedComponent = null;
     this.grid = null;
     this.simulation = null;
+    this.startAnimation();
   }
 
   destroy() {
