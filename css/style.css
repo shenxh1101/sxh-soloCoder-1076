@@ -25,6 +25,10 @@
   box-sizing: border-box;
 }
 
+.hidden {
+  display: none !important;
+}
+
 html, body {
   width: 100%;
   height: 100%;
@@ -113,6 +117,34 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.main.editor-active {
+  flex-direction: row !important;
+}
+
+.main.editor-active .sidebar-left {
+  width: 320px;
+  max-height: none !important;
+  flex-direction: column !important;
+  overflow-y: auto;
+  flex: 0 0 320px;
+}
+
+.main.editor-active .sidebar-left .panel {
+  min-width: auto !important;
+  flex-shrink: 1 !important;
+}
+
+.main.editor-active .sidebar-right {
+  width: 260px;
+  max-height: none !important;
+  flex-direction: column !important;
+  flex: 0 0 260px;
+}
+
+.main.editor-active .canvas-container {
+  flex: 1;
 }
 
 .sidebar-right {
@@ -410,7 +442,7 @@ kbd {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.8);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 1000;
@@ -420,6 +452,7 @@ kbd {
 }
 
 .modal.show {
+  display: flex;
   opacity: 1;
   pointer-events: auto;
 }
@@ -694,10 +727,8 @@ kbd {
   gap: 16px;
   max-height: calc(100vh - 120px);
   overflow-y: auto;
-}
-
-.editor-panel.hidden {
-  display: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .editor-header {

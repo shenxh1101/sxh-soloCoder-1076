@@ -246,10 +246,17 @@ class Game {
     }
   }
 
-  handleMouseMove(e) {
+  getGridPosition(e) {
     const rect = this.canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / this.cellSize);
-    const y = Math.floor((e.clientY - rect.top) / this.cellSize);
+    const cellWidth = rect.width / this.grid.width;
+    const cellHeight = rect.height / this.grid.height;
+    const x = Math.floor((e.clientX - rect.left) / cellWidth);
+    const y = Math.floor((e.clientY - rect.top) / cellHeight);
+    return { x, y };
+  }
+
+  handleMouseMove(e) {
+    const { x, y } = this.getGridPosition(e);
 
     if (this.grid.isValidPosition(x, y)) {
       this.hoveredCell = { x, y };
@@ -259,9 +266,7 @@ class Game {
   }
 
   handleClick(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / this.cellSize);
-    const y = Math.floor((e.clientY - rect.top) / this.cellSize);
+    const { x, y } = this.getGridPosition(e);
 
     if (!this.grid.isValidPosition(x, y)) return;
 
@@ -282,9 +287,7 @@ class Game {
   handleRightClick(e) {
     e.preventDefault();
 
-    const rect = this.canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / this.cellSize);
-    const y = Math.floor((e.clientY - rect.top) / this.cellSize);
+    const { x, y } = this.getGridPosition(e);
 
     if (!this.grid.isValidPosition(x, y)) return;
 
@@ -359,6 +362,10 @@ class Game {
 
     this.grid.render(this.ctx, this.cellSize);
 
+    if (this.editor.isActive && this.editor.editingLevel) {
+      this.renderEditorEndpoints();
+    }
+
     if (this.simulation) {
       this.simulation.render(this.ctx, this.cellSize);
     }
@@ -369,6 +376,49 @@ class Game {
 
     if (this.hoveredCell) {
       this.renderHoverHighlight();
+    }
+  }
+
+  renderEditorEndpoints() {
+    const level = this.editor.editingLevel;
+    const cellSize = this.cellSize;
+    const input = level.input;
+    const output = level.output;
+
+    if (input.x === output.x && input.y === output.y) {
+      const x = input.x;
+      const y = input.y;
+      const centerX = (x + 0.5) * cellSize;
+      const centerY = (y + 0.5) * cellSize;
+      const padding = cellSize * 0.1;
+      const halfWidth = (cellSize - padding * 3) / 2;
+
+      this.ctx.fillStyle = '#4ade8040';
+      this.ctx.fillRect(x * cellSize + padding, y * cellSize + padding, halfWidth, cellSize - padding * 2);
+      this.ctx.strokeStyle = '#4ade80';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(x * cellSize + padding, y * cellSize + padding, halfWidth, cellSize - padding * 2);
+      this.ctx.fillStyle = '#4ade80';
+      this.ctx.font = `bold ${cellSize * 0.25}px 'JetBrains Mono', monospace`;
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText('IN', x * cellSize + padding + halfWidth / 2, centerY);
+
+      this.ctx.fillStyle = '#f43f5e40';
+      this.ctx.fillRect(x * cellSize + padding * 2 + halfWidth, y * cellSize + padding, halfWidth, cellSize - padding * 2);
+      this.ctx.strokeStyle = '#f43f5e';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(x * cellSize + padding * 2 + halfWidth, y * cellSize + padding, halfWidth, cellSize - padding * 2);
+      this.ctx.fillStyle = '#f43f5e';
+      this.ctx.font = `bold ${cellSize * 0.25}px 'JetBrains Mono', monospace`;
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText('OUT', x * cellSize + padding * 2 + halfWidth + halfWidth / 2, centerY);
+
+      this.ctx.fillStyle = '#fbbf24';
+      this.ctx.font = `bold ${cellSize * 0.2}px 'JetBrains Mono', monospace`;
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('⚠', centerX, y * cellSize + padding + cellSize * 0.15);
     }
   }
 

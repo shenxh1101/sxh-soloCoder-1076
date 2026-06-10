@@ -516,6 +516,7 @@ function showEditorPanel() {
 
   renderComponentConfig();
 
+  document.querySelector('.main').classList.add('editor-active');
   document.getElementById('components-panel').classList.add('hidden');
   document.getElementById('editor-panel').classList.remove('hidden');
 
@@ -523,6 +524,7 @@ function showEditorPanel() {
 }
 
 function hideEditorPanel() {
+  document.querySelector('.main').classList.remove('editor-active');
   document.getElementById('components-panel').classList.remove('hidden');
   document.getElementById('editor-panel').classList.add('hidden');
 }
@@ -571,11 +573,17 @@ function showImportModal() {
 function showModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.style.display = '';
-  modal.classList.add('show');
+  requestAnimationFrame(() => {
+    modal.classList.add('show');
+  });
 }
 
 function hideModal(modalId) {
-  document.getElementById(modalId).classList.remove('show');
+  const modal = document.getElementById(modalId);
+  modal.classList.remove('show');
+  setTimeout(() => {
+    modal.style.display = '';
+  }, 300);
 }
 
 function showToast(message, type = 'info') {

@@ -131,6 +131,7 @@ class Editor {
     }
 
     this.game.remainingComponents = deepClone(this.editingLevel.availableComponents);
+    this.game.adjustCanvasSize();
     this.game.render();
   }
 
@@ -233,6 +234,8 @@ class Editor {
 
     this.validateAndFixPositions(width, height);
     this.loadLevelToGrid();
+    this.game.adjustCanvasSize();
+    this.game.render();
   }
 
   validateAndFixPositions(width, height) {
@@ -264,9 +267,7 @@ class Editor {
     }
 
     if (level.input.x === level.output.x && level.input.y === level.output.y) {
-      level.output.x = Math.min(level.input.x + 1, width - 1);
-      level.output.y = level.input.y;
-      issues.push('输出端位置已自动调整，避免与输入端重合');
+      issues.push('警告：输入端和输出端在同一格，保存/测试/导出时将提示错误');
     }
 
     if (issues.length > 0) {
